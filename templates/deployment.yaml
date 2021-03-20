@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "startup-test.fullname" . }}
+  labels:
+    {{- include "startup-test.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "startup-test.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "startup-test.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+          - /bin/sh
+          - -c
+          - echo hello > /tmp/mylog; sleep 10; echo world >> /tmp/mylog; sleep 180
+          startupProbe:
+            periodSeconds: 1
+            failureThreshold: 20
+            initialDelaySeconds: 2
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - date >> /tmp/check; grep world /tmp/mylog

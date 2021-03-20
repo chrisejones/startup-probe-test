@@ -1,0 +1,11 @@
+replicaCount: 1
+
+image:
+  repository: k8s.gcr.io/busybox
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+nameOverride: ""
+fullnameOverride: ""
+
